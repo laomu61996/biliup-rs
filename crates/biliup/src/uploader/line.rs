@@ -222,7 +222,7 @@ impl Line {
                 panic!("unsupported")
             }
             Uploader::Cos => Ok(Parcel {
-                line: Bucket::Cos(response.json().await?, self.probe_url == "internal"),
+                line: Bucket::Cos(serde_json::from_value::<cos::Bucket>(json_response)?, self.probe_url == "internal"),
                 video_file,
             }),
         }
