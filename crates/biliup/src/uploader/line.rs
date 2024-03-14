@@ -211,11 +211,11 @@ impl Line {
 
         match self.os {
             Uploader::Upos => Ok(Parcel {
-                line: Bucket::Upos(response.json().await?),
+                line: Bucket::Upos(serde_json::from_value::<upos::Bucket>(json_response)?),
                 video_file,
             }),
             Uploader::Kodo => Ok(Parcel {
-                line: Bucket::Kodo(response.json().await?),
+                line: Bucket::Kodo(serde_json::from_value::<kodo::Bucket>(json_response)?),
                 video_file,
             }),
             Uploader::Bos | Uploader::Gcs => {
