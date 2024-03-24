@@ -9,9 +9,28 @@
 2. Install [maturin](https://maturin.rs/): `$ pip3 install maturin`
 
 ```shell
-$python -m venv .env
-$source .env/bin/activate
-$maturin develop
+**1. 安装rust编译环境**
+
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+
+**直接回车开始安装**
+
+**安装完毕之后请输入以下指令设置环境变量**
+
+
+source "$HOME/.cargo/env"
+
+**2.安装以下依赖**
+
+pip3 install maturin
+apt install libssl-dev pkg-config -y
+
+**3.开始编译**
+
+python3 -m venv .env
+source .env/bin/activate
+maturin develop
 ```
 
 ## Credits
