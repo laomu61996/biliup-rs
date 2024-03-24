@@ -18,7 +18,7 @@ B 站命令行投稿工具，支持**短信登录**、**账号密码登录**、*
 
 to bulid biliup-rs
 ```shell
-$ git clone https://github.com/ForgQi/biliup-rs
+$ git clone https://github.com/laomu61996/biliup-rs-0.4.21.git
 $ cd biliup-rs
 $ cargo build --release
 ```
