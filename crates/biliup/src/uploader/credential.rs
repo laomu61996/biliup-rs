@@ -405,8 +405,8 @@ impl Credential {
     pub async fn login_by_qrcode(&self, value: Value) -> Result<LoginInfo> {
         let mut form = json!({
             "appkey": AppKeyStore::BiliTV.app_key(),
-            "local_id": "0",
             "auth_code": value["data"]["auth_code"],
+            "local_id": "0",
             "ts": SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()
         });
         let urlencoded = serde_urlencoded::to_string(&form)?;
@@ -414,15 +414,17 @@ impl Credential {
         form["sign"] = Value::from(sign);
         loop {
             tokio::time::sleep(Duration::from_secs(1)).await;
-            let res: ResponseData<ResponseValue> = self
+            let raw = self
                 .0
                 .client
                 .post("http://passport.bilibili.com/x/passport-tv-login/qrcode/poll")
                 .form(&form)
                 .send()
                 .await?
-                .json()
-                .await?;
+                .error_for_status()?;
+            let full = raw.bytes().await?;
+
+            let res: ResponseData<ResponseValue> = serde_json::from_slice(&full).map_err(|_| Kind::Custom(format!("error decoding response body, content: {:#?}", String::from_utf8_lossy(&full))))?;
             match res {
                 ResponseData {
                     code: 0,
