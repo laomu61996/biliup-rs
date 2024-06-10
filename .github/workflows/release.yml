@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false # don't fail other jobs if one fails
       matrix:
-        build: [x86_64-linux, x86_64-linux-musl, aarch64-linux, arm-linux, x86_64-macos, x86_64-windows, aarch64-macos] #, x86_64-win-gnu, win32-msvc
+        build: [x86_64-linux, x86_64-linux-musl, aarch64-linux, arm-linux, x86_64-macos, x86_64-windows, aarch64-macos,winarm64-windows] #, x86_64-win-gnu, win32-msvc
         include:
         - build: x86_64-linux
           os: ubuntu-22.04
@@ -58,6 +58,11 @@ jobs:
           rust: stable
           target: aarch64-apple-darwin
           cross: false
+        - build: winarm64-windows
+          os: windows-latest
+          rust: stable
+          target: aarch64-pc-windows-msvc # 或者是您的具体目标架构
+          cross: false
         # - build: x86_64-win-gnu
         #   os: windows-2019
         #   rust: stable-x86_64-gnu
@@ -80,6 +85,14 @@ jobs:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
           override: true
+
+      - name: Build release binary (winarm64)
+        if: matrix.build == 'winarm64-windows'
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: ${{ matrix.cross }}
+          command: build
+          args: --release --locked --target ${{ matrix.target }} -p biliup
 
       - name: Run cargo test
         if: matrix.build != 'aarch64-macos'
