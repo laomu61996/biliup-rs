@@ -247,6 +247,15 @@ pub fn bda2() -> Line {
     }
 }
 
+pub fn alia() -> Line {
+    Line {
+        os: Uploader::Upos,
+        query: "probe_version=20221109&upcdn=alia&zone=cs".into(),
+        probe_url: "//upos-cs-upcdnalia.bilivideo.com/OK".into(),
+        cost: 0,
+    }
+}
+
 pub fn ws() -> Line {
     Line {
         os: Uploader::Upos,
