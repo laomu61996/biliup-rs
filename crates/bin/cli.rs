@@ -139,6 +139,7 @@ pub enum UploadLine {
     Tx,
     Txa,
     Bda
+    Alia
 }
 
 fn human_size(s: &str) -> Result<u64, String> {
