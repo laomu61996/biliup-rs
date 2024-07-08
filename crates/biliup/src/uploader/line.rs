@@ -164,12 +164,11 @@ impl Line {
     pub async fn pre_upload(&self, bili: &BiliBili, video_file: VideoFile) -> Result<Parcel> {
         let total_size = video_file.total_size;
         let file_name = video_file.file_name.clone();
-        // let profile = if let Uploader::Upos = self.os {
-        //     "ugcupos/bup"
-        // } else {
-        //     "ugcupos/bupfetch"
-        // };
-        let profile = "ugcupos/bup";
+        let profile = if let Uploader::Upos = self.os {
+            "ugcupos/bup"
+        } else {
+            "ugcupos/bupfetch"
+        };
         let params = json!({
             "r": self.os,
             "profile": profile,
@@ -196,25 +195,36 @@ impl Line {
             )));
         }
         match self.os {
-            Uploader::Upos => Ok(Parcel {
-                line: Bucket::Upos(response.json().await?),
-                video_file,
-            }),
-            // Uploader::Kodo => Ok(Parcel {
-            //     line: Bucket::Kodo(response.json().await?),
-            //     video_file,
-            // }),
-            // Uploader::Bos | Uploader::Gcs => {
-            //     panic!("unsupported")
-            // }
-            // Uploader::Cos => Ok(Parcel {
-            //     line: Bucket::Cos(response.json().await?, self.probe_url == "internal"),
-            //     video_file,
-            // }),
-            // _ => {
-            //     panic!("unsupported")
-            // }
+
+        let mut json_response: serde_json::Value = response.json().await?;
+
+        if let Uploader::Upos = self.os {
+            let upcdn = self.query.split('&')
+                            .find_map(|s| {
+                                let mut split = s.splitn(2, '=');
+                                match (split.next(), split.next()) {
+                                    (Some("upcdn"), Some(value)) => Some(value),
+                                    _ => None,
+                                }
+                            })
+                            .expect("upcdn parameter is missing");
+            match upcdn  {
+                "ws" => json_response["endpoint"] = serde_json::to_value("//upos-cs-upcdnws.bilivideo.com").unwrap(),
+                "qn" => json_response["endpoint"] = serde_json::to_value("//upos-cs-upcdnqn.bilivideo.com").unwrap(),
+                "bldsa" => json_response["endpoint"] = serde_json::to_value("//upos-cs-upcdnbldsa.bilivideo.com").unwrap(),
+                "tx" => json_response["endpoint"] = serde_json::to_value("//upos-cs-upcdntx.bilivideo.com").unwrap(),
+                "txa" => json_response["endpoint"] = serde_json::to_value("//upos-cs-upcdntxa.bilivideo.com").unwrap(),
+                "bda" => json_response["endpoint"] = serde_json::to_value("//upos-cs-upcdnbda.bilivideo.com").unwrap(),
+                "alia" => json_response["endpoint"] = serde_json::to_value("//upos-cs-upcdnalia.bilivideo.com").unwrap(),
+                _ => (),  // No modification for other cases
+            }
         }
+
+        match self.os {
+            Uploader::Upos => Ok(Parcel {
+                line: Bucket::Upos(serde_json::from_value::<upos::Bucket>(json_response)?),
+                video_file,
+            })
     }
 }
 
@@ -304,7 +314,7 @@ pub fn tx() -> Line {
 pub fn txa() -> Line {
     Line {
         os: Uploader::Upos,
-        query: "zone=cs&upcdn=txa&probe_version=20221109".into(),
+        query: "probe_version=20221109&upcdn=bda&zone=cs".into(),
         probe_url: "//upos-cs-upcdntxa.bilivideo.com/OK".into(),
         cost: 0,
     }
@@ -313,8 +323,17 @@ pub fn txa() -> Line {
 pub fn bda() -> Line {
     Line {
         os: Uploader::Upos,
-        query: "zone=cs&upcdn=bda&probe_version=20221109".into(),
+        query: "probe_version=20221109&upcdn=bda&zone=cs".into(),
         probe_url: "//upos-cs-upcdnbda.bilivideo.com/OK".into(),
+        cost: 0,
+    }
+}
+
+pub fn alia() -> Line {
+    Line {
+        os: Uploader::Upos,
+        query: "probe_version=20221109&upcdn=alia&zone=cs".into(),
+        probe_url: "//upos-cs-upcdnalia.bilivideo.com/OK".into(),
         cost: 0,
     }
 }
