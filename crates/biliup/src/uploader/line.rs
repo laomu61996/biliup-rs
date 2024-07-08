@@ -225,6 +225,7 @@ impl Line {
                 line: Bucket::Upos(serde_json::from_value::<upos::Bucket>(json_response)?),
                 video_file,
             })
+        }
     }
 }
 
