@@ -239,6 +239,7 @@ pub async fn upload_by_app(studio_pre: StudioPre) -> Result<ResponseData> {
         Some(UploadLine::Tx) => line::tx(),
         Some(UploadLine::Txa) => line::txa(),
         Some(UploadLine::Bldsa) => line::bldsa(),
+        Some(UploadLine::Alia) => line::alia(),
         None => Probe::probe(&client.client).await.unwrap_or_default(),
     };
     for video_path in video_path {
