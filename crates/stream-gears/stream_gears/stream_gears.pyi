@@ -132,6 +132,9 @@ class UploadLine(Enum):
     Bldsa = 7
     """Bldsa"""
 
+    Alia = 8
+    """Alia"""
+
 
 def upload(video_path: List[str],
            cookie_file: str,
