@@ -194,7 +194,6 @@ impl Line {
                 response.text().await?
             )));
         }
-        match self.os {
 
         let mut json_response: serde_json::Value = response.json().await?;
 
